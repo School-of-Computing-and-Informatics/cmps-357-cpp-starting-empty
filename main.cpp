@@ -1,6 +1,8 @@
 #include <iostream>
 #include <memory>   // for std::unique_ptr, std::make_unique
 #include <string>
+#include <vector>
+#include <algorithm>  // std::sort
 
 class BankAccount {
 public:
@@ -23,19 +25,39 @@ public:
         std::cout << name << "'s Balance: $" << balance << "\n";
     }
 
+    double getBalance() const { return balance; }
+    const std::string& getName() const { return name; }
 private:
     std::string name;
     double balance;
 };
 
 int main() {
-    // Create a smart pointer that owns a BankAccount
-    std::unique_ptr<BankAccount> account =
-        std::make_unique<BankAccount>("Alice", 100.0);
+    srand(static_cast<unsigned>(time(nullptr)));
 
-    account->deposit(50);
-    account->withdraw(30);
-    account->printBalance();
+    std::vector<std::unique_ptr<BankAccount>> accounts;
 
-    // Memory freed automatically when 'account' goes out of scope
+    for (int i = 0; i < 100; i++) {
+        std::string name = "Account_" + std::to_string(i + 1);
+        double balance = (rand() % 10000) / 100.0;  // balance between 0.00 and 99.99
+
+        accounts.push_back(std::make_unique<BankAccount>(name, balance));
+    }
+
+    // Print first 5 as a check
+    for (int i = 0; i < 5; i++) {
+        accounts[i]->printBalance();
+    }
+
+    // Sort by balance ascending
+    std::sort(accounts.begin(), accounts.end(),
+        [](const std::unique_ptr<BankAccount>& a,
+           const std::unique_ptr<BankAccount>& b) {
+            return a->getBalance() < b->getBalance();
+        });
+
+    // Print first 5 after sorting
+    for (int i = 0; i < 5; i++) {
+        accounts[i]->printBalance();
+    }
 }
