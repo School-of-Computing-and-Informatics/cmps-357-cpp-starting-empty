@@ -1,9 +1,11 @@
 #include <iostream>
-#include <memory>  // for std::unique_ptr, std::make_unique
+#include <memory>   // for std::unique_ptr, std::make_unique
+#include <string>
 
 class BankAccount {
 public:
-    BankAccount(double initialBalance) : balance(initialBalance) {}
+    BankAccount(std::string accountName, double initialBalance)
+        : name(std::move(accountName)), balance(initialBalance) {}
 
     void deposit(double amount) {
         balance += amount;
@@ -13,26 +15,27 @@ public:
         if (balance >= amount) {
             balance -= amount;
         } else {
-            std::cout << "Insufficient funds\n";
+            std::cout << "Insufficient funds for " << name << "\n";
         }
     }
 
     void printBalance() const {
-        std::cout << "Balance: $" << balance << "\n";
+        std::cout << name << "'s Balance: $" << balance << "\n";
     }
 
 private:
+    std::string name;
     double balance;
 };
 
 int main() {
     // Create a smart pointer that owns a BankAccount
-    std::unique_ptr<BankAccount> account = std::make_unique<BankAccount>(100.0);
+    std::unique_ptr<BankAccount> account =
+        std::make_unique<BankAccount>("Alice", 100.0);
 
     account->deposit(50);
     account->withdraw(30);
     account->printBalance();
 
-
-    // No need to delete manually; memory is freed automatically
+    // Memory freed automatically when 'account' goes out of scope
 }
