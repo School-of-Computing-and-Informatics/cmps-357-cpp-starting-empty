@@ -32,7 +32,33 @@ private:
     double balance;
 };
 
-int main() {
+#include <wx/wx.h>
+
+class App : public wxApp {
+public:
+    bool OnInit() override {
+        auto* f = new wxFrame(nullptr, wxID_ANY, "Bank Accounts");
+        auto* panel = new wxPanel(f);
+        auto* msg = new wxStaticText(panel, wxID_ANY, "Hello wxWidgets");
+        auto* s = new wxBoxSizer(wxVERTICAL);
+        s->Add(msg, 0, wxALL, 12);
+        panel->SetSizerAndFit(s);
+        f->SetClientSize(panel->GetBestSize());
+        f->Centre();
+        f->Show();
+        return true;
+    }
+};
+wxIMPLEMENT_APP(App);
+
+int main(int argc, char** argv) {
+    const char* path = std::getenv("PATH");
+    if (path) {
+        std::cout << "PATH = " << path << "\n";
+    } else {
+        std::cout << "PATH not set\n";
+    }
+
     srand(static_cast<unsigned>(time(nullptr)));
 
     std::vector<std::unique_ptr<BankAccount>> accounts;
@@ -60,4 +86,7 @@ int main() {
     for (int i = 0; i < 5; i++) {
         accounts[i]->printBalance();
     }
+
+    return wxEntry(argc, argv);      // start wx
+
 }

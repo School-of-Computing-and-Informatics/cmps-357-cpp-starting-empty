@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="cmps_357_cpp_starting_empty" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="cmps_357_cpp_starting_empty" TARGET_NAME="cmps_357_cpp_starting_empty" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="cmps_357_cpp_starting_empty" RUN_TARGET_NAME="cmps_357_cpp_starting_empty">
+    <envs>
+      <env name="Path" value="C:\wxMSW-3.3.1\lib\vc14x_x64_dll\" />
+    </envs>
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>
