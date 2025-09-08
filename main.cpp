@@ -32,24 +32,46 @@ private:
     double balance;
 };
 
+
 #include <wx/wx.h>
+#include <wx/choice.h>
 
 class App : public wxApp {
 public:
     bool OnInit() override {
         auto* f = new wxFrame(nullptr, wxID_ANY, "Bank Accounts");
         auto* panel = new wxPanel(f);
-        auto* msg = new wxStaticText(panel, wxID_ANY, "Hello wxWidgets");
         auto* s = new wxBoxSizer(wxVERTICAL);
-        s->Add(msg, 0, wxALL, 12);
+
+        wxArrayString names;
+        if (accounts_) {
+            for (auto& acct : *accounts_) {
+                names.Add(acct->getName());
+            }
+        }
+
+        auto* choice = new wxChoice(panel, wxID_ANY, wxDefaultPosition,
+                                    wxDefaultSize, names);
+        s->Add(choice, 0, wxALL | wxEXPAND, 12);
+
         panel->SetSizerAndFit(s);
         f->SetClientSize(panel->GetBestSize());
         f->Centre();
         f->Show();
         return true;
     }
+
+    void SetAccounts(std::vector<std::unique_ptr<BankAccount>>* accounts) {
+        accounts_ = accounts;
+    }
+
+private:
+    std::vector<std::unique_ptr<BankAccount>>* accounts_ = nullptr;
 };
+
 wxIMPLEMENT_APP(App);
+
+static std::vector<std::unique_ptr<BankAccount>> accounts;
 
 int main(int argc, char** argv) {
     const char* path = std::getenv("PATH");
@@ -61,7 +83,7 @@ int main(int argc, char** argv) {
 
     srand(static_cast<unsigned>(time(nullptr)));
 
-    std::vector<std::unique_ptr<BankAccount>> accounts;
+    //std::vector<std::unique_ptr<BankAccount>> accounts;
 
     for (int i = 0; i < 100; i++) {
         std::string name = "Account_" + std::to_string(i + 1);
@@ -86,6 +108,8 @@ int main(int argc, char** argv) {
     for (int i = 0; i < 5; i++) {
         accounts[i]->printBalance();
     }
+
+    static_cast<App*>(wxApp::GetInstance())->SetAccounts(&accounts);
 
     return wxEntry(argc, argv);      // start wx
 
