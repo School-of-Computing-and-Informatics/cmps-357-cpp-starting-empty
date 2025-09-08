@@ -53,9 +53,13 @@ public:
         auto* choice = new wxChoice(panel, wxID_ANY, wxDefaultPosition,
                                     wxDefaultSize, names);
         s->Add(choice, 0, wxALL | wxEXPAND, 12);
-
         panel->SetSizerAndFit(s);
-        f->SetClientSize(panel->GetBestSize());
+
+        // use helper to compute dimensions
+        int winW = GetMaxNameWidth(panel, names) * 2;
+        int winH = static_cast<int>(winW * 0.75);
+
+        f->SetClientSize(winW, winH);
         f->Centre();
         f->Show();
         return true;
@@ -67,6 +71,19 @@ public:
 
 private:
     std::vector<std::unique_ptr<BankAccount>>* accounts_ = nullptr;
+
+    int GetMaxNameWidth(wxWindow* refWin, const wxArrayString& names) {
+        wxClientDC dc(refWin);
+        dc.SetFont(refWin->GetFont());
+        int maxW = 0, h = 0;
+        for (auto& name : names) {
+            int w, th;
+            dc.GetTextExtent(name, &w, &th);
+            if (w > maxW) maxW = w;
+            h = th;
+        }
+        return maxW;
+    }
 };
 
 wxIMPLEMENT_APP_NO_MAIN(App);
