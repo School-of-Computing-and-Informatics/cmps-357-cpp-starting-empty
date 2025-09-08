@@ -69,7 +69,7 @@ private:
     std::vector<std::unique_ptr<BankAccount>>* accounts_ = nullptr;
 };
 
-wxIMPLEMENT_APP(App);
+wxIMPLEMENT_APP_NO_MAIN(App);
 
 static std::vector<std::unique_ptr<BankAccount>> accounts;
 
@@ -109,8 +109,14 @@ int main(int argc, char** argv) {
         accounts[i]->printBalance();
     }
 
-    static_cast<App*>(wxApp::GetInstance())->SetAccounts(&accounts);
-
-    return wxEntry(argc, argv);      // start wx
+    // start wx, then set data, then run
+    if ( !wxEntryStart(argc, argv) ) return 1;
+    auto* app = wxTheApp;                    // now non-null
+    static_cast<App*>(app)->SetAccounts(&accounts);
+    if ( !app->CallOnInit() ) { wxEntryCleanup(); return 1; }
+    int code = app->OnRun();
+    app->OnExit();
+    wxEntryCleanup();
+    return code;
 
 }
