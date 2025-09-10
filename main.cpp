@@ -53,22 +53,38 @@ public:
         auto* choice = new wxChoice(panel, wxID_ANY, wxDefaultPosition,
                                     wxDefaultSize, names);
 
-        // choose font: size 14, default family, normal weight
         wxFont font(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-
-        choice->SetFont(font);      // apply font to choice control
-        panel->SetFont(font);       // optional: apply to whole panel
+        choice->SetFont(font);
+        panel->SetFont(font);
 
         s->Add(choice, 0, wxALL | wxEXPAND, 12);
+
+        // text field with instruction placeholder
+        auto* infoText = new wxStaticText(panel, wxID_ANY,
+                                          "Select an account to view balance");        infoText->SetFont(font);
+        s->Add(infoText, 0, wxALL | wxEXPAND, 12);
+
         panel->SetSizerAndFit(s);
 
-        // use helper to compute dimensions
-        int winW = GetMaxNameWidth(panel, names) * 2;
+        int winW = GetMaxNameWidth(panel, names) * 4;
         int winH = static_cast<int>(winW * 0.75);
 
         f->SetClientSize(winW, winH);
         f->Centre();
         f->Show();
+
+        // bind choice event to update infoText
+        choice->Bind(wxEVT_CHOICE, [this, infoText, choice](wxCommandEvent& evt) {
+            int sel = choice->GetSelection();
+            if (sel != wxNOT_FOUND && accounts_ && sel < static_cast<int>(accounts_->size())) {
+                auto& acct = *(*accounts_)[sel];
+                wxString msg = wxString::Format("%s: $%.2f",
+                                                acct.getName(),
+                                                acct.getBalance());
+                infoText->SetLabel(msg);
+            }
+        });
+
         return true;
     }
 
@@ -92,6 +108,7 @@ private:
         return maxW;
     }
 };
+
 
 wxIMPLEMENT_APP_NO_MAIN(App);
 
