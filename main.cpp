@@ -52,6 +52,13 @@ public:
 
         auto* choice = new wxChoice(panel, wxID_ANY, wxDefaultPosition,
                                     wxDefaultSize, names);
+
+        // choose font: size 14, default family, normal weight
+        wxFont font(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+
+        choice->SetFont(font);      // apply font to choice control
+        panel->SetFont(font);       // optional: apply to whole panel
+
         s->Add(choice, 0, wxALL | wxEXPAND, 12);
         panel->SetSizerAndFit(s);
 
