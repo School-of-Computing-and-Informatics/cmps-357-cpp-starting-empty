@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 #include <algorithm>  // std::sort
+#include <chrono>
+#include <string>
+#include <sstream>
 
 class BankAccount {
 public:
@@ -11,27 +14,52 @@ public:
 
     void deposit(double amount) {
         balance += amount;
+        lastUpdate = std::chrono::system_clock::now();
     }
 
     void withdraw(double amount) {
         if (balance >= amount) {
             balance -= amount;
+            lastUpdate = std::chrono::system_clock::now();
         } else {
             std::cout << "Insufficient funds for " << name << "\n";
         }
     }
 
     void printBalance() const {
-        std::cout << name << "'s Balance: $" << balance << "\n";
+        std::cout << name << "'s Balance: $" << balance;
+        if (lastUpdate.time_since_epoch().count() > 0) {
+            std::cout << "  " << getLastUpdateString();
+        }
+        std::cout << "\n";
     }
 
     double getBalance() const { return balance; }
     const std::string& getName() const { return name; }
+
+    std::string getLastUpdateString() const {
+        if (lastUpdate.time_since_epoch().count() == 0) {
+            return "(no transactions yet)";
+        }
+        using namespace std::chrono;
+        auto now = system_clock::now();
+        auto diff = duration_cast<minutes>(now - lastUpdate);
+
+        if (diff < minutes(1)) {
+            return "(just now)";
+        } else if (diff < hours(1)) {
+            return "(" + std::to_string(diff.count()) + " minutes ago)";
+        } else {
+            auto h = duration_cast<hours>(diff);
+            return "(" + std::to_string(h.count()) + " hours ago)";
+        }
+    }
+
 private:
     std::string name;
     double balance;
+    std::chrono::system_clock::time_point lastUpdate{};
 };
-
 
 #include <wx/wx.h>
 #include <wx/choice.h>
@@ -78,9 +106,10 @@ public:
             int sel = choice->GetSelection();
             if (sel != wxNOT_FOUND && accounts_ && sel < static_cast<int>(accounts_->size())) {
                 auto& acct = *(*accounts_)[sel];
-                wxString msg = wxString::Format("%s: $%.2f",
+                wxString msg = wxString::Format("%s: $%.2f %s",
                                                 acct.getName(),
-                                                acct.getBalance());
+                                                acct.getBalance(),
+                                                acct.getLastUpdateString().c_str());
                 infoText->SetLabel(msg);
             }
         });
