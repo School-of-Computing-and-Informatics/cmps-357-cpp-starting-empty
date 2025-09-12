@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>  // std::sort
 #include <chrono>
+#include <regex>
 #include <string>
 #include <sstream>
 
@@ -63,6 +64,7 @@ private:
 
 #include <wx/wx.h>
 #include <wx/choice.h>
+#include <wx/valtext.h>
 
 class App : public wxApp {
 public:
@@ -107,6 +109,30 @@ public:
         auto* dollarLabel = new wxStaticText(panel, wxID_ANY, "$");
         auto* amountField = new wxTextCtrl(panel, wxID_ANY);
         auto* submitBtn = new wxButton(panel, wxID_ANY, "Submit");
+
+        // allow only numbers and dot
+        wxTextValidator validator(wxFILTER_INCLUDE_CHAR_LIST);
+        wxArrayString includes;
+        for (char c = '0'; c <= '9'; ++c) includes.Add(wxString(c));
+        includes.Add("."); // decimal point
+        validator.SetIncludes(includes);
+        amountField->SetValidator(validator);
+
+        // Submit binding
+        submitBtn->Bind(wxEVT_BUTTON, [amountField](wxCommandEvent&) {
+            wxString val = amountField->GetValue();
+            std::string str = val.ToStdString();
+
+            // Regex for positive number with <=2 decimals
+            std::regex re(R"(^\d+(\.\d{1,2})?$)");
+            if (!std::regex_match(str, re)) {
+                std::cout << "[DEBUG] Invalid input: " << str << "\n";
+                return;
+            }
+
+            double amt = std::stod(str);
+            std::cout << "[DEBUG] Valid amount entered: " << amt << "\n";
+        });
 
         dollarLabel->SetFont(font);
         amountField->SetFont(font);
