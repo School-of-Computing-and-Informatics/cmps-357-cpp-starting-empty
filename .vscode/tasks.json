@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake Configure",
+            "type": "shell",
+            "command": "cmd.exe",
+            "args": [
+                "/c",
+                "call vcvarsall.bat x64 && cmake -S . -B build"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "CMake Build",
+            "type": "shell",
+            "command": "cmd.exe",
+            "args": [
+                "/c",
+                "call vcvarsall.bat x64 && cmake --build build"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

@@ -205,10 +205,10 @@ public:
         radioWithdraw->Bind(wxEVT_RADIOBUTTON, [](wxCommandEvent&) {
             std::cout << "[DEBUG] Withdraw radio selected\n";
         });
-        submitBtn->Bind(wxEVT_BUTTON, [amountField](wxCommandEvent&) {
+        /*submitBtn->Bind(wxEVT_BUTTON, [amountField](wxCommandEvent&) {
             std::cout << "[DEBUG] Submit clicked, amount = "
                       << amountField->GetValue().ToStdString() << "\n";
-        });
+        });*/
 
         return true;
     }
