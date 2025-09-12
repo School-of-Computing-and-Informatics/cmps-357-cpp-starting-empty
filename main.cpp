@@ -87,7 +87,7 @@ public:
 
         s->Add(choice, 0, wxALL | wxEXPAND, 12);
 
-        // text field with instruction placeholder
+        // info text
         auto* infoText = new wxStaticText(panel, wxID_ANY,
                                           "Select an account to view balance");
         infoText->SetFont(font);
@@ -97,12 +97,26 @@ public:
         auto* radioDeposit = new wxRadioButton(panel, wxID_ANY, "Deposit", wxDefaultPosition,
                                                wxDefaultSize, wxRB_GROUP);
         auto* radioWithdraw = new wxRadioButton(panel, wxID_ANY, "Withdraw");
-
         radioDeposit->SetFont(font);
         radioWithdraw->SetFont(font);
-
         s->Add(radioDeposit, 0, wxALL, 8);
         s->Add(radioWithdraw, 0, wxALL, 8);
+
+        // horizontal row: $ label, text field, submit button
+        auto* row = new wxBoxSizer(wxHORIZONTAL);
+        auto* dollarLabel = new wxStaticText(panel, wxID_ANY, "$");
+        auto* amountField = new wxTextCtrl(panel, wxID_ANY);
+        auto* submitBtn = new wxButton(panel, wxID_ANY, "Submit");
+
+        dollarLabel->SetFont(font);
+        amountField->SetFont(font);
+        submitBtn->SetFont(font);
+
+        row->Add(dollarLabel, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 6);
+        row->Add(amountField, 1, wxALIGN_CENTER_VERTICAL | wxRIGHT, 6);
+        row->Add(submitBtn, 0, wxALIGN_CENTER_VERTICAL);
+
+        s->Add(row, 0, wxALL | wxEXPAND, 12);
 
         panel->SetSizerAndFit(s);
 
@@ -113,7 +127,7 @@ public:
         f->Centre();
         f->Show();
 
-        // bind choice event
+        // bindings
         choice->Bind(wxEVT_CHOICE, [this, infoText, choice](wxCommandEvent& evt) {
             int sel = choice->GetSelection();
             if (sel != wxNOT_FOUND && accounts_ && sel < static_cast<int>(accounts_->size())) {
@@ -126,12 +140,15 @@ public:
             }
         });
 
-        // bind radio button events
         radioDeposit->Bind(wxEVT_RADIOBUTTON, [](wxCommandEvent&) {
-            std::cout << "Deposit selected\n";
+            std::cout << "[DEBUG] Deposit radio selected\n";
         });
         radioWithdraw->Bind(wxEVT_RADIOBUTTON, [](wxCommandEvent&) {
-            std::cout << "Withdraw selected\n";
+            std::cout << "[DEBUG] Withdraw radio selected\n";
+        });
+        submitBtn->Bind(wxEVT_BUTTON, [amountField](wxCommandEvent&) {
+            std::cout << "[DEBUG] Submit clicked, amount = "
+                      << amountField->GetValue().ToStdString() << "\n";
         });
 
         return true;
