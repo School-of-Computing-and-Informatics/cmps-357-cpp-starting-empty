@@ -14,11 +14,19 @@ public:
         : name(std::move(accountName)), balance(initialBalance) {}
 
     void deposit(double amount) {
+        if (amount <= 0) {
+            std::cout << "Invalid deposit amount for " << name << "\n";
+            return;
+        }
         balance += amount;
         lastUpdate = std::chrono::system_clock::now();
     }
 
     void withdraw(double amount) {
+        if (amount <= 0) {
+            std::cout << "Invalid withdrawal amount for " << name << "\n";
+            return;
+        }
         if (balance >= amount) {
             balance -= amount;
             lastUpdate = std::chrono::system_clock::now();
