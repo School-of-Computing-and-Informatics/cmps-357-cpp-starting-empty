@@ -89,8 +89,20 @@ public:
 
         // text field with instruction placeholder
         auto* infoText = new wxStaticText(panel, wxID_ANY,
-                                          "Select an account to view balance");        infoText->SetFont(font);
+                                          "Select an account to view balance");
+        infoText->SetFont(font);
         s->Add(infoText, 0, wxALL | wxEXPAND, 12);
+
+        // radio buttons
+        auto* radioDeposit = new wxRadioButton(panel, wxID_ANY, "Deposit", wxDefaultPosition,
+                                               wxDefaultSize, wxRB_GROUP);
+        auto* radioWithdraw = new wxRadioButton(panel, wxID_ANY, "Withdraw");
+
+        radioDeposit->SetFont(font);
+        radioWithdraw->SetFont(font);
+
+        s->Add(radioDeposit, 0, wxALL, 8);
+        s->Add(radioWithdraw, 0, wxALL, 8);
 
         panel->SetSizerAndFit(s);
 
@@ -101,7 +113,7 @@ public:
         f->Centre();
         f->Show();
 
-        // bind choice event to update infoText
+        // bind choice event
         choice->Bind(wxEVT_CHOICE, [this, infoText, choice](wxCommandEvent& evt) {
             int sel = choice->GetSelection();
             if (sel != wxNOT_FOUND && accounts_ && sel < static_cast<int>(accounts_->size())) {
@@ -114,8 +126,17 @@ public:
             }
         });
 
+        // bind radio button events
+        radioDeposit->Bind(wxEVT_RADIOBUTTON, [](wxCommandEvent&) {
+            std::cout << "Deposit selected\n";
+        });
+        radioWithdraw->Bind(wxEVT_RADIOBUTTON, [](wxCommandEvent&) {
+            std::cout << "Withdraw selected\n";
+        });
+
         return true;
     }
+
 
     void SetAccounts(std::vector<std::unique_ptr<BankAccount>>* accounts) {
         accounts_ = accounts;
