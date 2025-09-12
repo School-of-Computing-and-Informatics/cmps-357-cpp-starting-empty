@@ -127,20 +127,45 @@ public:
         amountField->SetValidator(validator);
 
         // Submit binding
-        submitBtn->Bind(wxEVT_BUTTON, [amountField](wxCommandEvent&) {
+        submitBtn->Bind(wxEVT_BUTTON, [this, choice, amountField, radioDeposit, radioWithdraw, infoText](wxCommandEvent&) {
+            int sel = choice->GetSelection();
+            if (sel == wxNOT_FOUND || !accounts_ || sel >= static_cast<int>(accounts_->size())) {
+                std::cout << "[DEBUG] No account selected\n";
+                return;
+            }
+
             wxString val = amountField->GetValue();
             std::string str = val.ToStdString();
 
-            // Regex for positive number with <=2 decimals
+            // Regex for positive number with up to 2 decimal places
             std::regex re(R"(^\d+(\.\d{1,2})?$)");
             if (!std::regex_match(str, re)) {
-                std::cout << "[DEBUG] Invalid input: " << str << "\n";
+                std::cout << "[DEBUG] Invalid amount: " << str << "\n";
                 return;
             }
 
             double amt = std::stod(str);
-            std::cout << "[DEBUG] Valid amount entered: " << amt << "\n";
+            auto& acct = *(*accounts_)[sel];
+
+            if (radioDeposit->GetValue()) {
+                acct.deposit(amt);
+                std::cout << "[DEBUG] Deposited " << amt << " to " << acct.getName() << "\n";
+            } else if (radioWithdraw->GetValue()) {
+                acct.withdraw(amt);
+                std::cout << "[DEBUG] Withdrew " << amt << " from " << acct.getName() << "\n";
+            } else {
+                std::cout << "[DEBUG] No transaction type selected\n";
+                return;
+            }
+
+            // update display
+            wxString msg = wxString::Format("%s: $%.2f %s",
+                                            acct.getName(),
+                                            acct.getBalance(),
+                                            acct.getLastUpdateString().c_str());
+            infoText->SetLabel(msg);
         });
+
 
         dollarLabel->SetFont(font);
         amountField->SetFont(font);
