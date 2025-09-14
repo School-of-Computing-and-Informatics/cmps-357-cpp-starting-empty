@@ -1,3 +1,18 @@
+# Ignore build directory and build results
+/build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.log
+*.user
+*.sln
+*.vcxproj*
+
 # Prerequisites
 *.d
 
